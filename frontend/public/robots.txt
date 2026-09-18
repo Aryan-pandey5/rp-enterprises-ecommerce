@@ -1,0 +1,21 @@
+# Allow search engine web crawlers to index public pages
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /products
+Allow: /disposable-products
+Allow: /raw-materials
+
+# Disallow indexing of internal, admin, and customer private routes
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /profile
+Disallow: /notifications
+Disallow: /order-success/*
+
+# Specify official XML Sitemap location
+Sitemap: https://rp-enterprises-ecommerce.vercel.app/sitemap.xml
