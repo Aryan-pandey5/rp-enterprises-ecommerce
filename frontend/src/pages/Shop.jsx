@@ -100,7 +100,7 @@ const Shop = ({ section = 'ALL' }) => {
     if (section === 'RAW_MATERIAL') {
       return t('rawMaterialDescription');
     }
-    return t('aboutSubheading');
+    return t('aboutHeroSubtitle');
   };
 
   return (

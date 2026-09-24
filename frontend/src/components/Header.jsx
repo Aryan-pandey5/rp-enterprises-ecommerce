@@ -67,7 +67,6 @@ const Header = () => {
   const navLinks = [
     { name: t("disposableProducts"), path: "/disposable-products" },
     { name: t("rawMaterials"), path: "/raw-materials" },
-    { name: t("allCatalog"), path: "/products" },
     { name: t("about"), path: "/about" },
     { name: t("contact"), path: "/contact" },
   ];
@@ -83,12 +82,12 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo & Brand Name */}
-          <div className="flex items-center space-x-3 shrink-0">
-            <Link to="/" className="flex items-center space-x-3 group">
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
               <img
                 src="/assets/logo.png"
                 alt="R.P. Enterprises Logo"
-                className="h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+                className="h-10 sm:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
                 onError={(e) => {
                   e.target.style.display = "none";
                   e.target.nextSibling.style.display = "flex";
@@ -98,10 +97,10 @@ const Header = () => {
                 RP
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                <span className="text-base sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                   R.P. ENTERPRISES
                 </span>
-                <span className="text-[10px] font-semibold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                <span className="text-[9px] sm:text-[10px] font-semibold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
                   Disposable Products & Raw Material
                 </span>
               </div>
@@ -128,8 +127,8 @@ const Header = () => {
             })}
           </nav>
 
-          {/* Auth State, Cart, Language, Theme Toggle & User Menu */}
-          <div className="hidden lg:flex items-center space-x-3">
+          {/* Auth State, Cart, Language, Theme Toggle & User Menu (Desktop) */}
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
             {/* Global Language Selector Button */}
             <div className="relative">
               <button
@@ -310,54 +309,21 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  to="/login"
-                  className="inline-flex items-center space-x-2 bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-xs transition-colors duration-200"
-                >
-                  <LogIn className="w-4 h-4" />
-                  <span>Login / Signup</span>
-                </Link>
-                <Link
-                  to="/admin/login"
-                  className="inline-flex items-center space-x-1.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-slate-200 hover:text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors shadow-xs border border-transparent dark:border-slate-700"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Admin Login</span>
-                </Link>
-              </div>
+              <Link
+                to="/login"
+                className="inline-flex items-center space-x-2 bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-xs transition-colors duration-200"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>{t("login")}</span>
+              </Link>
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button & Theme Toggle */}
-          <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={toggleLanguage}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold"
-              title="Change language / भाषा बदलें"
-              aria-label="Change language"
-            >
-              🌐 {language === "hi" ? "हिंदी" : "EN"}
-            </button>
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700"
-              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              aria-label={
-                isDark ? "Switch to light mode" : "Switch to dark mode"
-              }
-            >
-              {isDark ? (
-                <Sun className="w-5 h-5 text-amber-400" />
-              ) : (
-                <Moon className="w-5 h-5 text-slate-700" />
-              )}
-            </button>
-
+          {/* Mobile Menu Toggle Button */}
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-slate-800 focus:outline-hidden"
+              className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors focus:outline-hidden cursor-pointer"
               aria-label="Toggle Navigation Menu"
             >
               {isOpen ? (
@@ -372,92 +338,177 @@ const Header = () => {
 
       {/* Mobile Navigation Drawer */}
       {isOpen && (
-        <div className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-6 space-y-2 shadow-lg">
-          {navLinks.map((link) => {
-            const isActive = location.pathname === link.path;
-            return (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-3 rounded-lg text-base font-semibold transition-colors ${
-                  isActive
-                    ? "bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 font-bold"
-                    : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
+        <div className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pt-3 pb-6 space-y-4 shadow-lg animate-in fade-in slide-in-from-top-2 duration-150">
+          {/* Navigation Links */}
+          <div className="space-y-1">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`block px-4 py-2.5 rounded-xl text-base font-semibold transition-colors ${
+                    isActive
+                      ? "bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 font-bold"
+                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
 
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
-            <button
-              onClick={() => {
-                toggleLanguage();
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-4 py-3 rounded-lg text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between"
-            >
-              <span>{t("changeLanguage")}</span>
-              <span className="text-xs font-bold px-2 py-1 rounded bg-slate-200 dark:bg-slate-700">
-                🌐 {language === "hi" ? "हिंदी" : "English"}
-              </span>
-            </button>
-
+          {/* Account & Quick Actions */}
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
             {isAuthenticated ? (
               <>
                 <Link
+                  to="/cart"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <ShoppingCart className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span>{t("cart")}</span>
+                  </div>
+                  {itemCount > 0 && (
+                    <span className="bg-emerald-700 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                      {itemCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  to="/notifications"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-between px-4 py-2.5 rounded-xl text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <Bell className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span>{isHindi ? "सूचनाएं" : "Notifications"}</span>
+                  </div>
+                  {unreadNotifs > 0 && (
+                    <span className="bg-rose-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                      {unreadNotifs}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
                   to="/profile"
                   onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 rounded-lg text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className="flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
-                  My Profile ({user?.name})
+                  <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span>My Profile ({user?.name})</span>
                 </Link>
+
                 <Link
                   to="/orders"
                   onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 rounded-lg text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  className="flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-base font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
-                  My Orders
+                  <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  <span>My Orders</span>
                 </Link>
+
                 {user?.is_staff && (
                   <Link
                     to="/admin/dashboard"
                     onClick={() => setIsOpen(false)}
-                    className="block px-4 py-3 rounded-lg text-base font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 font-bold"
+                    className="flex items-center space-x-2.5 px-4 py-2.5 rounded-xl text-base font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60"
                   >
-                    Admin Dashboard
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Admin Dashboard</span>
                   </Link>
                 )}
+
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsOpen(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-lg text-base font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                  className="flex items-center space-x-2.5 w-full text-left px-4 py-2.5 rounded-xl text-base font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40"
                 >
-                  Sign Out
+                  <LogOut className="w-5 h-5" />
+                  <span>Sign Out</span>
                 </button>
               </>
             ) : (
-              <div className="pt-2 space-y-2">
+              <div className="pt-1">
                 <Link
                   to="/login"
                   onClick={() => setIsOpen(false)}
-                  className="block w-full text-center py-3 bg-emerald-700 text-white font-bold rounded-xl"
+                  className="flex items-center justify-center space-x-2 w-full text-center py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-xs transition-colors"
                 >
-                  Login / Signup
-                </Link>
-                <Link
-                  to="/admin/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block w-full text-center py-3 bg-slate-900 text-white font-bold rounded-xl"
-                >
-                  Admin Portal
+                  <LogIn className="w-4 h-4" />
+                  <span>{t("login")}</span>
                 </Link>
               </div>
             )}
+          </div>
+
+          {/* Mobile Controls: Language & Theme */}
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
+            {/* Language Selector */}
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+              <div className="flex items-center space-x-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <Globe className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{isHindi ? "भाषा / Language" : "Language"}</span>
+              </div>
+              <div className="flex items-center bg-slate-200 dark:bg-slate-700 p-1 rounded-lg text-xs font-bold">
+                <button
+                  onClick={() => setLanguage("en")}
+                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                    language === "en"
+                      ? "bg-emerald-700 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLanguage("hi")}
+                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                    language === "hi"
+                      ? "bg-emerald-700 text-white shadow-xs"
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  हिंदी
+                </button>
+              </div>
+            </div>
+
+            {/* Light / Dark Mode Toggle */}
+            <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+              <div className="flex items-center space-x-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                {isDark ? (
+                  <Moon className="w-4.5 h-4.5 text-amber-400 shrink-0" />
+                ) : (
+                  <Sun className="w-4.5 h-4.5 text-amber-500 shrink-0" />
+                )}
+                <span>{isHindi ? "थीम / Theme" : "Theme"}</span>
+              </div>
+              <button
+                onClick={toggleTheme}
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-amber-400 text-xs font-bold transition-all cursor-pointer"
+              >
+                {isDark ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Light</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-slate-700" />
+                    <span>Dark</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

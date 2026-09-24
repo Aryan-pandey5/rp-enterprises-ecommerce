@@ -1,33 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import CategoryCard from '../components/CategoryCard';
-import { API_BASE_URL } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
-import { Package, Layers, ShieldCheck, Truck, Cpu, Server, ArrowRight } from 'lucide-react';
+import { Package, Layers, ShieldCheck, Truck, Cpu, ArrowRight } from 'lucide-react';
 
 const Home = () => {
-  const [apiStatus, setApiStatus] = useState({ loading: true, success: false, message: '' });
   const { t } = useLanguage();
-
-  // Check Django Backend REST API endpoint GET /api/
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/`)
-      .then((res) => res.json())
-      .then((data) => {
-        setApiStatus({
-          loading: false,
-          success: true,
-          message: data.message || 'API Connected',
-        });
-      })
-      .catch((err) => {
-        console.warn('Django API fetch error (ensure server is running):', err);
-        setApiStatus({
-          loading: false,
-          success: false,
-          message: 'Backend server offline (Run `python manage.py runserver`)',
-        });
-      });
-  }, []);
 
   const disposableItems = [
     'paperDonaAllSizes',
@@ -54,23 +31,6 @@ const Home = () => {
       <section className="relative bg-gradient-to-b from-emerald-900 via-slate-900 to-slate-900 text-white pt-16 pb-20 px-4 sm:px-6 lg:px-8 rounded-b-3xl shadow-lg">
         <div className="max-w-7xl mx-auto">
           
-          {/* Backend API Connection Indicator Badge */}
-          <div className="flex justify-center mb-6">
-            <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md border ${
-              apiStatus.loading 
-                ? 'bg-amber-500/20 border-amber-400/40 text-amber-200'
-                : apiStatus.success
-                ? 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300'
-                : 'bg-rose-500/20 border-rose-400/40 text-rose-300'
-            }`}>
-              <Server className="w-4 h-4" />
-              <span>
-                Django API Status:{' '}
-                {apiStatus.loading ? t('loading') : apiStatus.message}
-              </span>
-            </div>
-          </div>
-
           <div className="text-center max-w-3xl mx-auto space-y-6">
             <span className="px-3.5 py-1 bg-emerald-700/60 border border-emerald-500/40 text-emerald-200 rounded-full text-xs font-bold uppercase tracking-wider">
               R.P. Enterprises
@@ -79,7 +39,7 @@ const Home = () => {
               {t('disposableProducts')} & <span className="text-emerald-400">{t('rawMaterials')}</span>
             </h1>
             <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
-              {t('aboutSubheading')}
+              {t('aboutHeroSubtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">

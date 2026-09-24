@@ -86,7 +86,7 @@ const Contact = () => {
                 </h3>
 
                 <p>
-                  {t('aboutSubheading')}
+                  {t('aboutHeroSubtitle')}
                 </p>
 
                 <p>

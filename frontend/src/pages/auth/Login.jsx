@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Phone, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { Phone, Lock, LogIn, AlertCircle, ShieldCheck } from 'lucide-react';
 
 // Customer Login Page
 const Login = () => {
@@ -123,12 +123,24 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Footer Link */}
-        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-500 dark:text-slate-400">
-          <span>{t('dontHaveAccount')} </span>
-          <Link to="/signup" className="font-bold text-emerald-700 dark:text-emerald-400 hover:underline">
-            {t('createAccount')}
-          </Link>
+        {/* Footer Links & Admin Login Link */}
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-4 text-center">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            <span>{t('dontHaveAccount')} </span>
+            <Link to="/signup" className="font-bold text-emerald-700 dark:text-emerald-400 hover:underline">
+              {t('createAccount')}
+            </Link>
+          </div>
+
+          <div className="pt-2">
+            <Link
+              to="/admin/login"
+              className="inline-flex items-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 shadow-xs"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>{t('adminLogin')}</span>
+            </Link>
+          </div>
         </div>
 
       </div>
