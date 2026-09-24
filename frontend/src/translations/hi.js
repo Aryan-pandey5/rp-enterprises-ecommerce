@@ -381,4 +381,11 @@ export default {
   sendDetails: "डिटेल्स भेजें",
   errNameRequired: "कृपया अपना नाम दर्ज करें।",
   errInvalidMobile: "कृपया एक मान्य 10-अंकों का मोबाइल नंबर दर्ज करें।",
+
+  // 404 Page Not Found
+  pageNotFoundTitle: "पेज नहीं मिला",
+  pageNotFoundSubTitle: "404 एरर",
+  pageNotFoundDesc: "ओह! आप जिस पेज को ढूंढ रहे हैं वह मौजूद नहीं है या शायद कहीं और स्थानांतरित कर दिया गया है।",
+  goToHome: "होम पर जाएं",
+  browseProducts: "प्रोडक्ट्स देखें",
 };

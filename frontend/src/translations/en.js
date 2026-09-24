@@ -381,4 +381,11 @@ export default {
   sendDetails: "Send Details",
   errNameRequired: "Please enter your full name.",
   errInvalidMobile: "Please enter a valid 10-digit Indian mobile number.",
+
+  // 404 Page Not Found
+  pageNotFoundTitle: "Page Not Found",
+  pageNotFoundSubTitle: "404 Error",
+  pageNotFoundDesc: "Oops! The page you're looking for doesn't exist or may have been moved.",
+  goToHome: "Go to Home",
+  browseProducts: "Browse Products",
 };
