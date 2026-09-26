@@ -388,4 +388,27 @@ export default {
   pageNotFoundDesc: "Oops! The page you're looking for doesn't exist or may have been moved.",
   goToHome: "Go to Home",
   browseProducts: "Browse Products",
+
+  // Password Management & Email Keys
+  emailLabel: "Email / Gmail",
+  enterEmail: "Enter your registered Email / Gmail",
+  forgotPasswordHeading: "Reset Your Password",
+  forgotPasswordSub: "Enter your registered Email/Gmail address to receive a secure password reset link.",
+  sendResetLink: "Send Reset Link",
+  resetPassword: "Reset Password",
+  resetPasswordSub: "Create a new secure password for your account.",
+  newPassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  oldPassword: "Old Password",
+  changePassword: "Change Password",
+  updatePassword: "Update Password",
+  resetLinkSent: "Password Reset Link Sent",
+  resetLinkSentDesc: "If an account exists with this email address, a secure password reset link has been sent. Please check your email inbox.",
+  passwordChangedSuccess: "Your password has been changed successfully.",
+  backToLogin: "Back to Login",
+  invalidEmail: "Please enter a valid email address.",
+  passwordsDoNotMatch: "Passwords do not match.",
+  enterOldPassword: "Enter current password",
+  enterNewPassword: "Enter new password (min 6 characters)",
 };
+

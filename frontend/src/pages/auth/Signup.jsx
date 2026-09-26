@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { User, Phone, MapPin, Lock, UserPlus, AlertCircle } from 'lucide-react';
+import { User, Phone, Mail, MapPin, Lock, UserPlus, AlertCircle } from 'lucide-react';
 
 // Customer Signup Page
 const Signup = () => {
   const [formData, setFormData] = useState({
     name: '',
     mobile_number: '',
+    email: '',
     address: '',
     password: '',
     confirm_password: '',
@@ -28,13 +29,19 @@ const Signup = () => {
     e.preventDefault();
     setError('');
 
-    if (!formData.name.trim() || !formData.mobile_number.trim() || !formData.address.trim()) {
+    if (!formData.name.trim() || !formData.mobile_number.trim() || !formData.email.trim() || !formData.address.trim()) {
       setError('Please fill in all required fields.');
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email.trim())) {
+      setError(t('invalidEmail'));
+      return;
+    }
+
     if (formData.password !== formData.confirm_password) {
-      setError('Password and Confirm Password do not match.');
+      setError(t('passwordsDoNotMatch'));
       return;
     }
 
@@ -112,6 +119,25 @@ const Signup = () => {
               />
             </div>
           </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+              {t('emailLabel')} *
+            </label>
+            <div className="relative">
+              <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3" />
+              <input
+                type="email"
+                name="email"
+                placeholder={t('enterEmail')}
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium"
+                required
+              />
+            </div>
+          </div>
+
 
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">

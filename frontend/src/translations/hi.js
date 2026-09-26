@@ -388,4 +388,27 @@ export default {
   pageNotFoundDesc: "ओह! आप जिस पेज को ढूंढ रहे हैं वह मौजूद नहीं है या शायद कहीं और स्थानांतरित कर दिया गया है।",
   goToHome: "होम पर जाएं",
   browseProducts: "प्रोडक्ट्स देखें",
+
+  // Password Management & Email Keys
+  emailLabel: "ईमेल / जीमेल",
+  enterEmail: "अपना पंजीकृत ईमेल / जीमेल दर्ज करें",
+  forgotPasswordHeading: "अपना पासवर्ड रीसेट करें",
+  forgotPasswordSub: "सुरक्षित पासवर्ड रीसेट लिंक प्राप्त करने के लिए अपना पंजीकृत ईमेल/जीमेल पता दर्ज करें।",
+  sendResetLink: "रीसेट लिंक भेजें",
+  resetPassword: "पासवर्ड रीसेट करें",
+  resetPasswordSub: "अपने अकाउंट के लिए एक नया सुरक्षित पासवर्ड बनाएं।",
+  newPassword: "नया पासवर्ड",
+  confirmNewPassword: "नए पासवर्ड की पुष्टि करें",
+  oldPassword: "पुराना पासवर्ड",
+  changePassword: "पासवर्ड बदलें",
+  updatePassword: "पासवर्ड अपडेट करें",
+  resetLinkSent: "पासवर्ड रीसेट लिंक भेज दिया गया है",
+  resetLinkSentDesc: "यदि इस ईमेल पते के साथ कोई अकाउंट मौजूद है, तो एक सुरक्षित पासवर्ड रीसेट लिंक भेज दिया गया है। कृपया अपना ईमेल इनबॉक्स जांचें।",
+  passwordChangedSuccess: "आपका पासवर्ड सफलतापूर्वक बदल दिया गया है।",
+  backToLogin: "लॉगिन पर वापस जाएं",
+  invalidEmail: "कृपया एक मान्य ईमेल पता दर्ज करें।",
+  passwordsDoNotMatch: "पासवर्ड मेल नहीं खाते हैं।",
+  enterOldPassword: "वर्तमान पासवर्ड दर्ज करें",
+  enterNewPassword: "नया पासवर्ड दर्ज करें (न्यूनतम 6 अक्षर)",
 };
+

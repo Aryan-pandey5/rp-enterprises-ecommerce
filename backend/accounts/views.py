@@ -8,6 +8,11 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
 
 from .models import CustomerProfile
 from .serializers import (
@@ -15,7 +20,10 @@ from .serializers import (
     CustomerProfileSerializer,
     AdminCustomerSerializer,
     AdminCreateCustomerSerializer,
-    AdminLoginSerializer
+    AdminLoginSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
+    ChangePasswordSerializer
 )
 from orders.models import Order
 from orders.serializers import OrderSerializer
@@ -70,11 +78,13 @@ def register_api(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name,
+            "email": user.email,
             "mobile_number": user.profile.mobile_number,
             "address": user.profile.address,
             "is_staff": user.is_staff
         }
     }, status=status.HTTP_201_CREATED)
+
 
 
 @api_view(['POST'])
@@ -125,11 +135,13 @@ def login_api(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name or user.username,
+            "email": user.email,
             "mobile_number": mobile,
             "address": address,
             "is_staff": user.is_staff
         }
     }, status=status.HTTP_200_OK)
+
 
 
 @api_view(['POST'])
@@ -239,6 +251,7 @@ def me_api(request):
             "id": user.id,
             "username": user.username,
             "name": user.first_name or user.username,
+            "email": user.email,
             "mobile_number": mobile,
             "address": address,
             "is_staff": user.is_staff,
@@ -246,6 +259,7 @@ def me_api(request):
             "role": "admin" if user.is_staff else "customer"
         }
     })
+
 
 
 @api_view(['GET', 'POST'])
@@ -414,3 +428,131 @@ def admin_customers_bulk_delete_api(request):
         "failed_count": failed_count,
         "failed_items": failed_items
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_request_api(request):
+    """
+    Password Reset Link Request API.
+    Sends a secure one-time password reset link to the registered email address.
+    Generates generic response to prevent user email enumeration.
+    """
+    serializer = PasswordResetRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    email = serializer.validated_data['email'].strip().lower()
+    
+    # Generic success message response (prevents account enumeration)
+    generic_success_msg = "If an account exists with this email address, a password reset link has been sent to your email."
+
+    try:
+        user = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        return Response({"message": generic_success_msg}, status=status.HTTP_200_OK)
+
+    if not user.is_active:
+        return Response({"message": generic_success_msg}, status=status.HTTP_200_OK)
+
+    # Generate one-time reset token & encoded user ID
+    token = default_token_generator.make_token(user)
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    
+    frontend_domain = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+    reset_url = f"{frontend_domain}/reset-password/{uidb64}/{token}"
+
+    subject = "Password Reset Request — R.P. Enterprises"
+    message = f"""Hello {user.first_name or 'Customer'},
+
+We received a request to reset your password for your R.P. Enterprises account.
+
+Click the link below to set a new password:
+{reset_url}
+
+If you did not request a password reset, please ignore this email. Your password will remain unchanged.
+
+Best regards,
+R.P. Enterprises Team
+"""
+    try:
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'R.P. Enterprises <noreply@rp-enterprises.com>'),
+            recipient_list=[email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        # Log error internally, return generic response to client
+        print(f"Error sending password reset email to {email}: {e}")
+
+    return Response({"message": generic_success_msg}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_confirm_api(request):
+    """
+    Password Reset Confirmation API.
+    Consumes secure uidb64 and token to set a new password.
+    """
+    serializer = PasswordResetConfirmSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    uidb64 = serializer.validated_data['uidb64']
+    token = serializer.validated_data['token']
+    password = serializer.validated_data['password']
+
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return Response(
+            {"error": "Invalid password reset link or user account not found."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not default_token_generator.check_token(user, token):
+        return Response(
+            {"error": "This password reset link is invalid or has expired. Please request a new link."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user.set_password(password)
+    user.save()
+
+    return Response({
+        "message": "Password has been successfully changed. You can now login with your new password."
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password_api(request):
+    """
+    Authenticated Customer Change Password API.
+    Verifies old password before setting new password.
+    """
+    serializer = ChangePasswordSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    user = request.user
+    old_password = serializer.validated_data['old_password']
+    new_password = serializer.validated_data['new_password']
+
+    if not user.check_password(old_password):
+        return Response(
+            {"error": "Incorrect old password. Please enter your current password correctly."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    user.set_password(new_password)
+    user.save()
+
+    return Response({
+        "message": "Your password has been changed successfully."
+    }, status=status.HTTP_200_OK)
+

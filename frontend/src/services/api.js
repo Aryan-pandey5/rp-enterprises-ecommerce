@@ -92,7 +92,29 @@ export const authService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile_number: mobileNumber, password }),
     }),
+  requestPasswordReset: (email) =>
+    fetch(`${API_BASE_URL}/auth/password-reset/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }),
+  confirmPasswordReset: (uidb64, token, password, confirmPassword) =>
+    fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uidb64, token, password, confirm_password: confirmPassword }),
+    }),
+  changePassword: (oldPassword, newPassword, confirmPassword) =>
+    apiFetch('/auth/change-password/', {
+      method: 'POST',
+      body: JSON.stringify({
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      }),
+    }),
 };
+
 
 // Product API endpoints
 export const productService = {

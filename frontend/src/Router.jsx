@@ -15,6 +15,8 @@ import NotFoundPage from './components/NotFoundPage';
 // Auth Pages
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 import AdminLogin from './pages/auth/AdminLogin';
 
 // Public Storefront & Product Pages
@@ -65,9 +67,18 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
+        path: 'forgot-password',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'reset-password/:uidb64/:token',
+        element: <ResetPassword />,
+      },
+      {
         path: 'products',
         element: <Shop section="ALL" />,
       },
+
       {
         path: 'shop',
         element: <Shop section="ALL" />,

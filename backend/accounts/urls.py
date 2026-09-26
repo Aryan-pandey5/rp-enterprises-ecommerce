@@ -10,6 +10,10 @@ urlpatterns = [
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('auth/profile/', views.profile_api, name='auth-profile'),
     path('auth/me/', views.me_api, name='auth-me'),
+    path('auth/password-reset/', views.password_reset_request_api, name='auth-password-reset'),
+    path('auth/password-reset/confirm/', views.password_reset_confirm_api, name='auth-password-reset-confirm'),
+    path('auth/change-password/', views.change_password_api, name='auth-change-password'),
+
 
     # Admin customer management endpoints
     path('admin/customers/', views.admin_customers_api, name='admin-customers'),

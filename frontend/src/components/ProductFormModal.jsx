@@ -24,6 +24,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imgPreviewError, setImgPreviewError] = useState(false);
   const [removeImage, setRemoveImage] = useState(false);
 
   // Global GSM Prices table for live calculation preview
@@ -69,6 +70,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
       });
       const existingImg = productToEdit.image_url || productToEdit.image;
       setImagePreview(existingImg ? getMediaUrl(existingImg) : null);
+      setImgPreviewError(false);
       setImageFile(null);
       setRemoveImage(false);
       setVariants(productToEdit.variants?.length ? productToEdit.variants : []);
@@ -84,6 +86,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
         is_active: true,
       });
       setImagePreview(null);
+      setImgPreviewError(false);
       setImageFile(null);
       setRemoveImage(false);
       setVariants([
@@ -122,6 +125,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
       }
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      setImgPreviewError(false);
       setRemoveImage(false);
       setError('');
     }
@@ -133,6 +137,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
     }
     setImageFile(null);
     setImagePreview(null);
+    setImgPreviewError(false);
     setRemoveImage(true);
   };
 
@@ -396,8 +401,13 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
             </label>
             <div className="flex items-center space-x-4">
               <div className="relative h-20 w-20 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
-                {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                {imagePreview && !imgPreviewError ? (
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    onError={() => setImgPreviewError(true)} 
+                    className="h-full w-full object-cover" 
+                  />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 )}

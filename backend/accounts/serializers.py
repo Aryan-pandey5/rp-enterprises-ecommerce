@@ -8,6 +8,7 @@ from orders.models import Order
 class RegisterSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=150, required=True)
     mobile_number = serializers.CharField(max_length=15, required=True)
+    email = serializers.EmailField(required=True)
     address = serializers.CharField(max_length=500, required=True)
     password = serializers.CharField(write_only=True, required=True, min_length=6)
     confirm_password = serializers.CharField(write_only=True, required=True)
@@ -27,6 +28,12 @@ class RegisterSerializer(serializers.Serializer):
         
         return cleaned_mobile
 
+    def validate_email(self, value):
+        cleaned_email = value.strip().lower()
+        if User.objects.filter(email__iexact=cleaned_email).exists():
+            raise serializers.ValidationError("This email / Gmail address is already registered. Please login or click Forgot Password.")
+        return cleaned_email
+
     def validate_address(self, value):
         if not value.strip():
             raise serializers.ValidationError("Address cannot be empty.")
@@ -40,11 +47,13 @@ class RegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         name = validated_data['name']
         mobile_number = validated_data['mobile_number']
+        email = validated_data['email']
         address = validated_data['address']
         password = validated_data['password']
 
         user = User.objects.create_user(
             username=mobile_number,
+            email=email,
             first_name=name,
             password=password
         )
@@ -61,11 +70,12 @@ class RegisterSerializer(serializers.Serializer):
 class CustomerProfileSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='user.first_name', required=True)
     username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', required=False, allow_blank=True)
     is_staff = serializers.BooleanField(source='user.is_staff', read_only=True)
 
     class Meta:
         model = CustomerProfile
-        fields = ['id', 'username', 'name', 'mobile_number', 'address', 'is_staff', 'created_at', 'updated_at']
+        fields = ['id', 'username', 'name', 'email', 'mobile_number', 'address', 'is_staff', 'created_at', 'updated_at']
 
     def validate_mobile_number(self, value):
         cleaned = re.sub(r'\D', '', value)
@@ -73,10 +83,31 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Mobile number must contain between 10 and 15 digits.")
         return cleaned
 
+    def validate_email(self, value):
+        if not value:
+            return ""
+        cleaned_email = value.strip().lower()
+        user = getattr(self.instance, 'user', None)
+        qs = User.objects.filter(email__iexact=cleaned_email)
+        if user:
+            qs = qs.exclude(pk=user.pk)
+        if qs.exists():
+            raise serializers.ValidationError("This email / Gmail address is already taken by another account.")
+        return cleaned_email
+
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
+        user_updated = False
+
         if 'first_name' in user_data:
             instance.user.first_name = user_data['first_name'].strip()
+            user_updated = True
+
+        if 'email' in user_data:
+            instance.user.email = user_data['email'].strip().lower()
+            user_updated = True
+
+        if user_updated:
             instance.user.save()
 
         if 'mobile_number' in validated_data:
@@ -102,6 +133,7 @@ class AdminCustomerSerializer(serializers.ModelSerializer):
     Supports ORM annotated fields (annotated_orders & annotated_purchase) to avoid N+1 queries.
     """
     name = serializers.CharField(source='first_name')
+    email = serializers.CharField(source='email', read_only=True)
     mobile_number = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     date_joined = serializers.DateTimeField(format="%Y-%m-%d")
@@ -110,7 +142,7 @@ class AdminCustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'name', 'mobile_number', 'address', 'date_joined', 'total_orders', 'total_spent']
+        fields = ['id', 'username', 'name', 'email', 'mobile_number', 'address', 'date_joined', 'total_orders', 'total_spent']
 
     def get_mobile_number(self, obj):
         try:
@@ -144,6 +176,7 @@ class AdminCreateCustomerSerializer(serializers.Serializer):
     """
     name = serializers.CharField(max_length=150, required=True)
     mobile_number = serializers.CharField(max_length=20, required=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
     address = serializers.CharField(max_length=500, required=True)
     password = serializers.CharField(write_only=True, min_length=6, required=True)
 
@@ -170,3 +203,40 @@ class AdminLoginSerializer(serializers.Serializer):
     """
     username = serializers.CharField(required=True, trim_whitespace=True)
     password = serializers.CharField(required=True, write_only=True)
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """
+    Validates customer email payload for password reset link generation.
+    """
+    email = serializers.EmailField(required=True)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """
+    Validates UID, token, and new password matching for password reset submission.
+    """
+    uidb64 = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
+    password = serializers.CharField(write_only=True, required=True, min_length=6)
+    confirm_password = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, data):
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError({"confirm_password": "New password and confirm password do not match."})
+        return data
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Validates old password, new password, and confirm password for authenticated customer password update.
+    """
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=6)
+    confirm_password = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, data):
+        if data.get('new_password') != data.get('confirm_password'):
+            raise serializers.ValidationError({"confirm_password": "New password and confirm password do not match."})
+        return data
+

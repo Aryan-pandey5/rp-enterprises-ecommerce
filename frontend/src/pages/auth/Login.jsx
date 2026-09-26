@@ -98,9 +98,17 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-              {t('password')}
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                {t('password')}
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
+              >
+                {t('forgotPassword')}
+              </Link>
+            </div>
             <div className="relative">
               <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3" />
               <input
@@ -113,6 +121,7 @@ const Login = () => {
               />
             </div>
           </div>
+
 
           <button
             type="submit"
