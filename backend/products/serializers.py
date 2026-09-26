@@ -85,7 +85,11 @@ class ProductSerializer(serializers.ModelSerializer):
                 url = obj.image.url
                 request = self.context.get('request')
                 if request:
-                    return request.build_absolute_uri(url)
+                    full_url = request.build_absolute_uri(url)
+                    if request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https':
+                        if full_url.startswith('http://'):
+                            full_url = full_url.replace('http://', 'https://', 1)
+                    return full_url
                 return url
             except Exception:
                 return None

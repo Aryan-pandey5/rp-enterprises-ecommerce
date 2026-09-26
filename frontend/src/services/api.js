@@ -11,18 +11,38 @@ export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8
 export const getMediaUrl = (url) => {
   if (!url) return null;
   if (typeof url !== 'string') return null;
-  const trimmed = url.trim();
+  let trimmed = url.trim();
   if (!trimmed) return null;
+
   if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
     return trimmed;
   }
-  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-    return trimmed;
+
+  const backendOrigin = API_BASE_URL.replace(/\/api\/?$/, '');
+  const isProdBackend = !backendOrigin.includes('localhost') && !backendOrigin.includes('127.0.0.1');
+
+  // Fix legacy or local DB URLs containing localhost / 127.0.0.1 when running against production backend
+  if ((trimmed.includes('127.0.0.1') || trimmed.includes('localhost')) && isProdBackend) {
+    const pathIndex = trimmed.indexOf('/media/');
+    if (pathIndex !== -1) {
+      trimmed = trimmed.substring(pathIndex);
+    }
   }
-  
-  const origin = API_BASE_URL.replace(/\/api\/?$/, '');
-  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  return `${origin}${cleanPath}`;
+
+  // Prepend backend origin if relative path
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+    trimmed = `${backendOrigin}${cleanPath}`;
+  }
+
+  // Enforce HTTPS if frontend page is served over HTTPS to avoid Mixed Content browser blocking
+  if (typeof window !== 'undefined' && window.location && window.location.protocol === 'https:') {
+    if (trimmed.startsWith('http://') && !trimmed.includes('localhost') && !trimmed.includes('127.0.0.1')) {
+      trimmed = trimmed.replace(/^http:\/\//i, 'https://');
+    }
+  }
+
+  return trimmed;
 };
 
 /**

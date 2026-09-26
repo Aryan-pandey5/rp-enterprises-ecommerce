@@ -30,10 +30,18 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         if obj.product and obj.product.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.product.image.url)
-            return obj.product.image.url
+            try:
+                url = obj.product.image.url
+                request = self.context.get('request')
+                if request:
+                    full_url = request.build_absolute_uri(url)
+                    if request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https':
+                        if full_url.startswith('http://'):
+                            full_url = full_url.replace('http://', 'https://', 1)
+                    return full_url
+                return url
+            except Exception:
+                return None
         return None
 
     def get_weight_display(self, obj):
@@ -121,10 +129,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     def get_product_image(self, obj):
         if obj.product and obj.product.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.product.image.url)
-            return obj.product.image.url
+            try:
+                url = obj.product.image.url
+                request = self.context.get('request')
+                if request:
+                    full_url = request.build_absolute_uri(url)
+                    if request.is_secure() or request.META.get('HTTP_X_FORWARDED_PROTO') == 'https':
+                        if full_url.startswith('http://'):
+                            full_url = full_url.replace('http://', 'https://', 1)
+                    return full_url
+                return url
+            except Exception:
+                return None
         return None
 
     def get_weight_display(self, obj):
