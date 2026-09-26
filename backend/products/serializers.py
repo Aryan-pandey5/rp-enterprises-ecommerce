@@ -81,10 +81,14 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
+            try:
+                url = obj.image.url
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(url)
+                return url
+            except Exception:
+                return None
         return None
 
     def get_gsm_display(self, obj):
@@ -204,6 +208,15 @@ class ProductSerializer(serializers.ModelSerializer):
                         variants_data = parsed_variants
                 except Exception:
                     pass
+
+            remove_image = str(request.data.get('remove_image', '')).lower() == 'true'
+            if remove_image:
+                instance.image = None
+            elif 'image' not in request.FILES:
+                validated_data.pop('image', None)
+        else:
+            if 'image' in validated_data and validated_data['image'] is None:
+                validated_data.pop('image', None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

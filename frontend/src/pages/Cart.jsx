@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getMediaUrl } from '../services/api';
 import { 
   ShoppingCart, 
   Trash2, 
@@ -120,9 +121,9 @@ const Cart = () => {
                     <div className="flex items-start space-x-4">
                       
                       <div className="h-16 w-16 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
-                        {item.product_image && !imgErrors[item.id] ? (
+                        {getMediaUrl(item.product_image) && !imgErrors[item.id] ? (
                           <img
-                            src={item.product_image}
+                            src={getMediaUrl(item.product_image)}
                             alt={item.product_name}
                             onError={() => handleImageError(item.id)}
                             className="h-full w-full object-cover"

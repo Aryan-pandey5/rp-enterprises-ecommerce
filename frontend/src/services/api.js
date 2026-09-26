@@ -3,6 +3,29 @@
 export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api').replace(/\/$/, '');
 
 /**
+ * Normalizes image & media URLs across development and production environments.
+ * Handles relative paths (/media/...), full URLs (http/https), blob preview URLs, data URLs, and nulls.
+ * @param {string} url - Image URL string from API or file preview
+ * @returns {string|null} - Formatted absolute or blob image URL, or null if empty
+ */
+export const getMediaUrl = (url) => {
+  if (!url) return null;
+  if (typeof url !== 'string') return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  
+  const origin = API_BASE_URL.replace(/\/api\/?$/, '');
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${origin}${cleanPath}`;
+};
+
+/**
  * Retrieves the stored access token from localStorage.
  */
 export const getAuthToken = () => localStorage.getItem('rp_access_token');

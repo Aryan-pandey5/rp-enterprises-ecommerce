@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
-import { API_BASE_URL } from '../services/api';
+import { API_BASE_URL, getMediaUrl } from '../services/api';
 import { 
   Package, 
   ArrowLeft, 
@@ -162,9 +162,9 @@ const ProductDetail = () => {
         {/* Left Column: Product Image View */}
         <div className="lg:col-span-5 space-y-4">
           <div className="aspect-4/3 bg-slate-100 dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-sm flex items-center justify-center relative">
-            {product.image_url && !imgError ? (
+            {getMediaUrl(product.image_url || product.image) && !imgError ? (
               <img
-                src={product.image_url}
+                src={getMediaUrl(product.image_url || product.image)}
                 alt={product.name}
                 onError={() => setImgError(true)}
                 className="w-full h-full object-cover"

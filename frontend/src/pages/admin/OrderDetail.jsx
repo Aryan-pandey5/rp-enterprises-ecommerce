@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { API_BASE_URL } from '../../services/api';
+import { API_BASE_URL, getMediaUrl } from '../../services/api';
 import { 
   Package, 
   ArrowLeft, 
@@ -205,9 +205,9 @@ const OrderDetail = () => {
               <div key={item.id} className="p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center space-x-4">
                   <div className="h-14 w-14 bg-slate-100 border border-slate-200 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
-                    {item.product_image && !imgErrors[item.id] ? (
+                    {getMediaUrl(item.product_image) && !imgErrors[item.id] ? (
                       <img
-                        src={item.product_image}
+                        src={getMediaUrl(item.product_image)}
                         alt={item.product_name}
                         onError={() => handleImageError(item.id)}
                         className="h-full w-full object-cover"

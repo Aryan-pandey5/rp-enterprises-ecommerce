@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, ArrowRight, Layers, Tag, CheckCircle2 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { getMediaUrl } from '../services/api';
 
 const ProductCard = ({ product }) => {
   const [imgError, setImgError] = useState(false);
@@ -32,15 +33,18 @@ const ProductCard = ({ product }) => {
     }
   }
 
+  const rawImgUrl = product.image_url || product.image;
+  const displayImgUrl = getMediaUrl(rawImgUrl);
+
   return (
     <div className="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 hover:border-emerald-300 dark:hover:border-emerald-500 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
       
       <div>
         {/* Product Image Area */}
         <div className="relative aspect-4/3 bg-slate-100 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700/60 overflow-hidden flex items-center justify-center">
-          {product.image_url && !imgError ? (
+          {displayImgUrl && !imgError ? (
             <img
-              src={product.image_url}
+              src={displayImgUrl}
               alt={product.name}
               onError={() => setImgError(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

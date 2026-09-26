@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { API_BASE_URL } from '../../services/api';
+import { API_BASE_URL, getMediaUrl } from '../../services/api';
 import ProductFormModal from '../../components/ProductFormModal';
 import CategoryFormModal from '../../components/CategoryFormModal';
 import BulkDeleteModal from '../../components/BulkDeleteModal';
@@ -416,9 +416,9 @@ const Products = () => {
                       <td className="py-4 px-6">
                         <div className="flex items-center space-x-3">
                           <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0 overflow-hidden flex items-center justify-center">
-                            {prod.image_url && !imgErrors[prod.id] ? (
+                            {getMediaUrl(prod.image_url || prod.image) && !imgErrors[prod.id] ? (
                               <img 
-                                src={prod.image_url} 
+                                src={getMediaUrl(prod.image_url || prod.image)} 
                                 alt={prod.name} 
                                 onError={() => handleImageError(prod.id)}
                                 className="h-full w-full object-cover" 

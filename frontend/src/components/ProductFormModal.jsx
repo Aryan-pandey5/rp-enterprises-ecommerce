@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, PackagePlus, Plus, Trash2, Image as ImageIcon, AlertCircle, Layers, Calculator } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { API_BASE_URL } from '../services/api';
+import { API_BASE_URL, getMediaUrl } from '../services/api';
 
 // Supported fixed GSM choices for Raw Material products
 const FIXED_GSM_CHOICES = [80, 90, 100, 120, 140];
@@ -24,6 +24,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [removeImage, setRemoveImage] = useState(false);
 
   // Global GSM Prices table for live calculation preview
   const [globalGsmPrices, setGlobalGsmPrices] = useState([]);
@@ -66,8 +67,10 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
         description: productToEdit.description || '',
         is_active: productToEdit.is_active ?? true,
       });
-      setImagePreview(productToEdit.image_url || null);
+      const existingImg = productToEdit.image_url || productToEdit.image;
+      setImagePreview(existingImg ? getMediaUrl(existingImg) : null);
       setImageFile(null);
+      setRemoveImage(false);
       setVariants(productToEdit.variants?.length ? productToEdit.variants : []);
     } else {
       setFormData({
@@ -82,6 +85,7 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
       });
       setImagePreview(null);
       setImageFile(null);
+      setRemoveImage(false);
       setVariants([
         { variant_name: 'Standard - 100 Pcs/Bori', unit_packing: '100 pcs/bori', price: '450.00', stock: 50, is_active: true }
       ]);
@@ -105,9 +109,31 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file (JPG, PNG, WEBP).');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image file size must be 5MB or smaller.');
+        return;
+      }
+      if (imagePreview && imagePreview.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      setRemoveImage(false);
+      setError('');
     }
+  };
+
+  const handleRemoveImage = () => {
+    if (imagePreview && imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImageFile(null);
+    setImagePreview(null);
+    setRemoveImage(true);
   };
 
   const handleAddVariant = () => {
@@ -188,6 +214,8 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
 
       if (imageFile) {
         dataPayload.append('image', imageFile);
+      } else if (removeImage) {
+        dataPayload.append('remove_image', 'true');
       }
 
       if (!isRawMaterial) {
@@ -363,25 +391,37 @@ const ProductFormModal = ({ isOpen, onClose, productToEdit, categories, onProduc
 
           {/* Image Upload & Preview */}
           <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               Product Image
             </label>
             <div className="flex items-center space-x-4">
-              <div className="h-20 w-20 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="relative h-20 w-20 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
-                  <ImageIcon className="w-8 h-8 text-slate-400" />
+                  <ImageIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 )}
               </div>
-              <div className="space-y-1 text-xs">
+              <div className="space-y-2 text-xs grow">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                  className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-950 dark:file:text-emerald-300 cursor-pointer"
                 />
-                <p className="text-slate-400">JPG, PNG or WEBP up to 5MB.</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-slate-400">JPG, PNG or WEBP up to 5MB.</p>
+                  {imagePreview && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="inline-flex items-center space-x-1 text-xs text-rose-600 dark:text-rose-400 hover:underline font-semibold cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove Image</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>

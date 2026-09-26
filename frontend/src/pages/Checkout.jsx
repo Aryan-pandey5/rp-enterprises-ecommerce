@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useLanguage } from '../context/LanguageContext';
-import { API_BASE_URL } from '../services/api';
+import { API_BASE_URL, getMediaUrl } from '../services/api';
 import { 
   ShoppingBag, 
   MapPin, 
@@ -211,9 +211,9 @@ const Checkout = () => {
                 <div key={item.id} className="py-3 flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="h-12 w-12 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shrink-0 flex items-center justify-center overflow-hidden">
-                      {item.product_image && !imgErrors[item.id] ? (
+                      {getMediaUrl(item.product_image) && !imgErrors[item.id] ? (
                         <img
-                          src={item.product_image}
+                          src={getMediaUrl(item.product_image)}
                           alt={item.product_name}
                           onError={() => handleImageError(item.id)}
                           className="h-full w-full object-cover"
